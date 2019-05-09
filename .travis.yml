@@ -1,0 +1,35 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t cgironda/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run cgironda/react-test npm test test-coverage -- --coverage
+
+after_success:
+  - docker build -t cgironda/multi-client ./client
+  - docker build -t cgironda/multi-nginx ./nginx
+  - docker build -t cgironda/multi-server ./server
+  - docker build -t cgironda/multi-worker ./worker
+  # Log in to the Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to Docker Hub
+  - docker push cgironda/multi-client
+  - docker push cgironda/multi-nginx
+  - docker push cgironda/multi-server
+  - docker push cgironda/multi-worker
+
+  deploy:
+    provider: elasticbeanstalk
+    region: "ap-northeast-1"
+    app: "multi-docker"
+    env: "MultiDocker-env"
+    bucket_name: "elasticbeanstalk-ap-northeast-1-826164420214"
+    bucket_path: "docker-multi"
+    on:
+      branch: master
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key:
+      secure: "$AWS_SECRET_KEY"
