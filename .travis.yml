@@ -21,6 +21,7 @@ after_success:
   - docker push cgironda/multi-server
   - docker push cgironda/multi-worker
 
+Comment: >
   deploy:
     provider: elasticbeanstalk
     region: "ap-northeast-1"
