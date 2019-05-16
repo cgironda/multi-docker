@@ -15,7 +15,7 @@ after_success:
   - docker build -t cgironda/multi-worker ./worker
   # Log in to the Docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Take those images and push them to DockerHub
+  # Take those images and push them to DockerHub repository
   - docker push cgironda/multi-client
   - docker push cgironda/multi-nginx
   - docker push cgironda/multi-server
